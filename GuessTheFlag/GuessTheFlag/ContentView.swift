@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var scoreTitle = ""
     @State private var userScore = 0
+    @State private var numberOfQuestions = 1
     
     var body: some View {
         
@@ -49,9 +50,18 @@ struct ContentView: View {
                                 .cornerRadius(10)
                                 .shadow(radius: 10)
                         }.alert(scoreTitle, isPresented: $showingScore) {
-                            Button("Continue", action: askQuestion)
+                            // Button("Continue", action: askQuestion)
+                            if numberOfQuestions == 8 {
+                                Button("Restart", action: askQuestion)
+                            } else {
+                                Button("Continue", action: askQuestion)
+                            }
                         } message: {
-                            Text("Your score is \(userScore)")
+                            if numberOfQuestions == 8 {
+                                Text("The test has ended, your final score is: \(userScore)")
+                            } else{
+                                Text("Your score is \(userScore)")
+                            }
                         }
                     }
                 }
@@ -67,6 +77,8 @@ struct ContentView: View {
                     .foregroundStyle(.white)
                     .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/.bold())
                 
+                Text("Question Number: \(numberOfQuestions)").foregroundStyle(.white)
+                
                 Spacer()
             }.padding()
         }
@@ -77,15 +89,23 @@ struct ContentView: View {
             scoreTitle = "Correct"
             userScore += 1
         } else {
-            scoreTitle = "Wrong"
+            scoreTitle = "Wrong, Thats the flag of \(countries[number])"
         }
 
         showingScore = true
     }
     
     func askQuestion() {
-        countries.shuffle()
-        corretAnswer = Int.random(in: 0...2)
+        if numberOfQuestions < 8{
+            countries.shuffle()
+            corretAnswer = Int.random(in: 0...2)
+            numberOfQuestions += 1
+        } else if numberOfQuestions == 8 {
+            // The quiz restarts
+            numberOfQuestions = 1
+            userScore = 0
+        }
+        
     }
 }
 
